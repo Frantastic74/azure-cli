@@ -17,6 +17,13 @@ function title {
     echo -e ${LGREEN}$1${CLEAR}
 }
 
+function error_msg {
+    LRED='\033[1;31m'
+    CLEAR='\033[0m'
+
+    echo -e ${LRED}$1${CLEAR}
+}
+
 # title 'Install azdev'
 # pip install -qqq -e ./tools
 
@@ -49,7 +56,8 @@ SITE_PACKAGES_DIR=`find $PYTHON_DIR -name site-packages`
 set +e
 for TEST_DIR in `find $SITE_PACKAGES_DIR/azure/cli/command_modules -type d | grep -e 'tests/latest$'`; do
     echo ""
-    title "Run automation in $TEST_DIR"
-    pytest -n 16 --no-print-logs $TEST_DIR
+    MODULE_NAME=`basename $(dirname $(dirname $TEST_DIR))`
+    title "Run automation in $MODULE_NAME"
+    pytest -n 16 --no-print-logs $TEST_DIR || error_msg "Test failed in module $MODULE_NAME."
     echo ""
 done
