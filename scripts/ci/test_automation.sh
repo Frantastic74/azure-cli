@@ -54,10 +54,15 @@ PYTHON_DIR=`cd $(dirname $(which python)); cd ..; pwd`
 SITE_PACKAGES_DIR=`find $PYTHON_DIR -name site-packages`
 
 set +e
+TEST_RESULT=0
+
 for TEST_DIR in `find $SITE_PACKAGES_DIR/azure/cli/command_modules -type d | grep -e 'tests/latest$'`; do
     echo ""
     MODULE_NAME=`basename $(dirname $(dirname $TEST_DIR))`
     title "Run automation in $MODULE_NAME"
-    pytest -n 16 --no-print-logs $TEST_DIR || error_msg "Test failed in module $MODULE_NAME."
+    pytest -n 16 --no-print-logs $TEST_DIR || { error_msg "Test failed in module $MODULE_NAME."; TEST_RESULT=1; }
     echo ""
 done
+
+exit $TEST_RESULT
+
